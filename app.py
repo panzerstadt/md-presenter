@@ -3,10 +3,21 @@
 from flask import Flask, render_template, Markup
 import markdown
 
-import os
+import os, re
 from shutil import copyfile
 
 """
+FORMAT
+------
+currently there are two extra tags to remember in addition to markdown formatting:
+<!-- next slide --> : slices your slides into separate slides
+(bg) : (WIP) takes your image and turns it into a background image (maybe alt-text="background" is more reliable?)
+
+also takes
+<h1> and <h2> tags and turns them into 'title page' style slides
+
+------
+
 NOTES
 -----
 Markdown workflow:
@@ -36,6 +47,9 @@ _ underscore
 def markdown_to_html(md_content):
     return Markup(markdown.markdown(md_content))
 
+
+def markdown_to_html_unescaped(md_content):
+    return markdown.markdown(md_content)
 
 def copy_images_to_static(src_dir, dst_dir='./static/images'):
     temp = list(os.walk(src_dir))
@@ -78,12 +92,59 @@ def ensure_images(line_of_text, image_dir='./static/'):
     return line_of_text
 
 
+def convert_html_tags(html_string, html_tags=['h1', 'h2'], divider="<!--next slide-->"):
+    for tag in html_tags:
+        start_tag = '<{0}>'.format(tag)
+        end_tag = '</{0}>'.format(tag)
+
+        # start tag
+        html_string = html_string.replace(start_tag, '{0}\n{1}'.format(divider, start_tag))
+        #end tag
+        html_string = html_string.replace(end_tag, '{0}\n{1}'.format(end_tag, divider))
+
+    return html_string
+
+
+# TODO: turn images into bg with the (bg) flag at the end of the markdown image
+def convert_slides(html_string):
+    # turns words from these tags into slides (usually titles)
+    html_tags_to_convert = ['h1', 'h2']
+    # add these classes into the div container
+    classes_slides = "slide-divider"
+    classes_css = "slides"
+    html_divider = "<!--next slide-->"
+
+    temp = convert_html_tags(html_string, html_tags=html_tags_to_convert, divider=html_divider)
+
+    temp = re.split('<!--\s*next slide\s*-->', temp)
+    print(str(len(temp)) + ' slides found.')
+
+    converted = []
+    for stuff in temp:
+        if len(stuff) <= 1:
+            print('deleting one empty slide')
+        else:
+            #print('appending ', stuff, '\n----------')
+            converted.append(
+                """
+                <div class='{0}'>
+                <div class='{1}'>
+                {2}
+                </div>
+                </div>
+                """.format(classes_slides, classes_css, stuff)
+            )
+    # print(converted[0])
+    return ''.join(converted)
+
+
 def make_content(filepath_in, urlify=True, fix_images=True):
     image_dir = os.path.dirname(filepath_in) + '/'
     copy_images_to_static(image_dir)  # makes a copy of the images found in the content's local /images folder
 
     with open(filepath_in, encoding='utf-8', errors='ignore') as md_content:
         md_content = md_content.readlines()
+        # DO MARKDOWN INJECTION HERE
         for j, line in enumerate(md_content):
             if urlify:
                 line = ensure_url(line)
@@ -92,7 +153,12 @@ def make_content(filepath_in, urlify=True, fix_images=True):
             md_content[j] = line
         result = ''.join(md_content)
 
-    html_content = markdown_to_html(result)
+    html_content = markdown_to_html_unescaped(result)
+    html_content = convert_slides(html_content)
+    html_content = Markup(html_content)
+    #print(type(html_content))
+    # DO HTML INJECTION HERE
+
     output = html_content
     return output
 
@@ -100,7 +166,7 @@ def make_content(filepath_in, urlify=True, fix_images=True):
 
 app = Flask(__name__)
 
-test_file = './static/content/introduction to git/git-readme.md'
+test_file = './static/content/google earth engine/gee-readme.md'
 content = make_content(test_file)
 
 @app.route('/')
