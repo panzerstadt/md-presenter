@@ -117,10 +117,15 @@ def convert_slides(html_string):
     temp = convert_html_tags(html_string, html_tags=html_tags_to_convert, divider=html_divider)
 
     temp = re.split('<!--\s*next slide\s*-->', temp)
+
+    # cleaning the list of blank slides
+    # only keep the bits that are longer than 2 characters
+    temp = list(filter(lambda x: len(x) >= 2, temp))
+
     print(str(len(temp)) + ' slides found.')
 
     converted = []
-    for stuff in temp:
+    for i, stuff in enumerate(temp):
         if len(stuff) <= 1:
             print('deleting one empty slide')
         else:
@@ -128,11 +133,11 @@ def convert_slides(html_string):
             converted.append(
                 """
                 <div class='{0}'>
-                <div class='{1}'>
+                <div id='slide{3}' class='{1}'>
                 {2}
                 </div>
                 </div>
-                """.format(classes_slides, classes_css, stuff)
+                """.format(classes_slides, classes_css, stuff, i)
             )
     # print(converted[0])
     return ''.join(converted)

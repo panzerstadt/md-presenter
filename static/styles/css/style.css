@@ -9,7 +9,8 @@ html {
   transition: all 500ms;
   transition-timing-function: ease-in-out;
   transition-delay: 50ms;
-  background-color: #F9F9F9; }
+  background-color: #F9F9F9;
+  counter-reset: slide-number; }
 
 .markdown-body {
   transition: all 500ms;
@@ -29,7 +30,7 @@ html {
   .slide-divider:nth-child(odd) {
     box-shadow: 0px 0px 5px #D7DAE5; }
 
-@media (max-width: 767px) {
+@media only screen and (min-device-width: 1200px) and (max-width: 900px) {
   html {
     background-color: #EDEDED; }
 
@@ -45,8 +46,8 @@ html {
 .slides {
   position: absolute;
   top: 0;
-  left: calc((100vw - (100vw - 100%))/2 - 80vh);
-  width: 160vh;
+  left: calc((100vw - (100vw - 100%))/2 - 66.6666666667vh);
+  width: 133.3333333333vh;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -56,12 +57,12 @@ html {
   box-sizing: border-box;
   padding: 5px;
   background-color: #F9F9F9; }
-  @media (max-aspect-ratio: 16 / 10) {
+  @media (max-aspect-ratio: 4 / 3) {
     .slides {
-      top: calc(50vh - 0.3125 * (100vw-(100vw-100%)));
+      top: calc(50vh - 0.375 * (100vw-(100vw-100%)));
       left: 0;
       width: calc(100vw - (100vw - 100%));
-      height: 62.5vh; } }
+      height: 75vh; } }
 
 .bounding-box {
   background-image: url(...);

@@ -40,6 +40,13 @@ html {
 	transition-delay: $slide-transition-delay;
 
 	background-color: $color-bg;
+
+	// for making hrefs
+	// this makes a var in css called slide-number
+	counter-reset: slide-number;
+
+	// use counter-increment: slide-number to add 1
+	// then use counter(slide-number) to get the number
 }
 
 // settings for entire scrolling page
@@ -80,7 +87,10 @@ html {
 }
 
 // what to do when this page is resized
-@media (max-width: 767px) {
+// for my own (1280x800) screen (LQ)
+@media only screen
+and (min-device-width: 1200px)
+and (max-width: 900px) {
 	html {
 		background-color: $color-alt-bg;
 		// wash gradient left
@@ -147,7 +157,8 @@ html {
 
 	// settings to fit presentation screen
 	// TODO: expose on interface
-	@include proportional-box(16, 10);
+	// right now 4:3 fitted to a 16:10 makes for nice transitions
+	@include proportional-box(4, 3);
 
 	// center everything
 	display: flex;
