@@ -6,9 +6,55 @@ font-family: 'Open Sans Condensed', sans-serif;
 font-family: 'Lato', sans-serif;
 */
 
+
+// FUNCTIONS (CALLED MIXINS IN CSS)
+
+// proportional box mixin copied from
+// https://codepen.io/thebabydino/pen/MajxzY?editors=0100
+@mixin proportional-box($a: 1, $b: $a) {
+	position: absolute;
+
+	// scrollbar shit
+	// https://stackoverflow.com/questions/33606565/is-it-possible-to-calculate-the-viewport-width-vw-without-scrollbar
+	// below is the width without scrollbars
+	// calc(100vw - (100vw - 100%))
+	// where (100vw - 100%) is scrollbar width
+	$clean-100vw: calc(100vw - (100vw - 100%));
+
+  	top: 0;
+  	//left: calc(50vw - #{$a/$b/2*100vh});
+  	left: calc((100vw - (100vw - 100%))/2 - #{$a/$b/2*100vh});
+  	width: $a/$b*100vh;
+  	height: 100vh;
+  	//background-color: blue;
+  	
+  	//ORIGINAL
+  	// @media (max-aspect-ratio: #{$a}/#{$b}) {
+   //  	//top: calc(50vh - #{$b/$a/2*100vw});
+   //  	top: calc(50vh - #{$b/$a/2} * (100vw-(100vw-100%)));
+   //  	left: 0;
+   //  	width: $clean-100vw;
+   //  	height: $b/$a*#{$clean-100vw};
+   //  	background-color: green;
+  	// }
+
+  	//RESPONSIVE according to max aspect ratio
+	@media (max-aspect-ratio: #{$a}/#{$b}) {
+	top: calc(50vh - #{$b/$a/2} * (100vw-(100vw-100%)));
+	left: 0;
+	width: $clean-100vw;
+	height: $b/$a*100vh;
+	//background-color: green;
+    }
+}
+
+
+// VARIABLES (DECLARED WITH $variable-name IN CSS)
+
 $font-title: 'Playfair Display', serif;
 $font-title-2: 'Raleway', sans-serif;
 $font-text: 'Oswald', sans-serif;
+$font-text-2: 'Montserrat', sans-serif;
 
 $sml-font-size: 1.5vw;
 
@@ -29,7 +75,15 @@ $slide-transition: all 500ms;
 $slide-transition-timing: ease-in-out;
 $slide-transition-delay: 50ms;
 
-$menu-width: 100px;
+$menu-width: 30px;
+$links-column-size: 20px;
+
+// set your presentation slide proportions here
+$OPTION-slide-proportions: (16, 12);
+
+// from OPTION variable above
+$slide-x: nth($OPTION-slide-proportions, 1);
+$slide-y: nth($OPTION-slide-proportions, 2);
 
 // THINGS WITH RESPONSIVE TRANSITIONS
 
@@ -49,6 +103,36 @@ html {
 	// then use counter(slide-number) to get the number
 }
 
+.scroll-container {
+	height: 95vh;
+	//width: calc(100vw-100%);
+
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+
+	-webkit-scroll-snap-type: mandatory;
+	scroll-snap-type: y mandatory;
+	-webkit-scroll-snap-destination: 50% 50%;
+	scroll-snap-destination: 50% 50%;
+
+	// friggin scroll bar
+	//display: absolute;
+	//right: -22px; // windows is 17px, osx is 15px
+	//margin-right: 17px;
+	//z-index: 0;
+
+	//padding-right: 10px;
+
+	//background-color: black;
+}
+
+.scroll-area {
+	-webkit-scroll-snap-coordinate: 50% 50%;
+	scroll-snap-coordinate: 50% 50%;
+	scroll-snap-align: center;
+}
+
 // settings for entire scrolling page
 .markdown-body {
 		transition: $slide-transition;
@@ -62,95 +146,34 @@ html {
 		margin: 0 auto;
 		padding: 0px;
 		//padding: 45px;
+
+		position: relative;
 	}
+
 
 // settings for each 'presentation slide(page)'
 // shadow to divide slides
 .slide-divider {
-	//transition: $slide-transition;
-	//transition-timing-function: $slide-transition-timing;
-	//transition-delay: $slide-transition-delay;
-
-	&:nth-child(odd) {
-		// every odd-numbered slide
-		//background: $color-alt-bg;
-		box-shadow: $box-shadow;
-	}
-
-	height: 100%;
-	height: 100vh;
 	position: relative;
-	//padding: 5px;
-	margin: 15px;
+
+	// not working well yet
+	// &:nth-child(odd) {
+	// 	box-shadow: $box-shadow;
+	// }
+	// margin: 5px; // for box shadow
+
+	// dictates the slide height
+	// IMPORTANT
+	height: 100%;
+  	height: 100vh;
+	
+	
 
 	background-color: $color-bg
 }
 
-// what to do when this page is resized
-// for my own (1280x800) screen (LQ)
-@media only screen
-and (min-device-width: 1200px)
-and (max-width: 900px) {
-	html {
-		background-color: $color-alt-bg;
-		// wash gradient left
-		//box-shadow: 1/2*$menu-width -10px $menu-width $color-mid-dark inset;
-	}
-
-	.markdown-body {
-		padding: 0 0 0 $menu-width;
-		//padding: 15px;
-	}
-
-	.slide-divider {
-		background-color: darken($color-mid, 1);
-		// apply box shadow to every slide in edit mode
-		box-shadow: $box-shadow;
-	}
-
-	.slides {
-		background-color: white;
-	}
-}
 
 
-// proportional box mixin copied from
-// https://codepen.io/thebabydino/pen/MajxzY?editors=0100
-@mixin proportional-box($a: 1, $b: $a, $scrollbar-width: 15px) {
-	position: absolute;
-
-	// scrollbar shit
-	// https://stackoverflow.com/questions/33606565/is-it-possible-to-calculate-the-viewport-width-vw-without-scrollbar
-	// below is the width without scrollbars
-	// calc(100vw - (100vw - 100%))
-	// where (100vw - 100%) is scrollbar width
-	$clean-100vw: calc(100vw - (100vw - 100%));
-
-  	top: 0;
-  	//left: calc(50vw - #{$a/$b/2*100vh});
-  	left: calc((100vw - (100vw - 100%))/2 - #{$a/$b/2*100vh});
-  	width: $a/$b*100vh;
-  	height: 100vh;
-  	//background-color: blue;
-  
-  	// @media (max-aspect-ratio: #{$a}/#{$b}) {
-   //  	//top: calc(50vh - #{$b/$a/2*100vw});
-   //  	top: calc(50vh - #{$b/$a/2} * (100vw-(100vw-100%)));
-   //  	left: 0;
-   //  	width: $clean-100vw;
-   //  	height: $b/$a*#{$clean-100vw};
-   //  	background-color: green;
-  	// }
-
-	@media (max-aspect-ratio: #{$a}/#{$b}) {
-	//top: calc(50vh - #{$b/$a/2*100vw});
-	top: calc(50vh - #{$b/$a/2} * (100vw-(100vw-100%)));
-	left: 0;
-	width: $clean-100vw;
-	height: $b/$a*100vh;
-	//background-color: green;
-    }
-}
 
 // page-as-container
 .slides {
@@ -158,7 +181,7 @@ and (max-width: 900px) {
 	// settings to fit presentation screen
 	// TODO: expose on interface
 	// right now 4:3 fitted to a 16:10 makes for nice transitions
-	@include proportional-box(4, 3);
+	@include proportional-box($slide-x, $slide-y);
 
 	// center everything
 	display: flex;
@@ -170,7 +193,7 @@ and (max-width: 900px) {
 	overflow: hidden;
 	box-sizing: border-box;
 	padding: 5px;
-	background-color: $color-bg;
+	background: $color-bg;
 
 	//background: #e53b2c;  // debug
 	
@@ -198,7 +221,7 @@ h1, h2, h3 {
 	font-family: $font-title-2;
 }
 
-ul, ol, a, p, pre {
+li, p, pre {
 	transition: font-size 0ms;
 	font-size: $sml-font-size;
 
@@ -219,15 +242,113 @@ ul, ol, a, p, pre {
 }
 
 
+// sidebar shows when in 'edit mode', which is when window
+// is resized to smaller an 900px
+.sidebar-menu {
+	float: left;
+	display: none;
+
+	height: 80vh;
+	
+	// scrollable with hidden scrollbar
+	overflow-x: hidden;
+	overflow-y: scroll;
+	//width: $links-column-size;
+	//left: 120px;
+
+	padding: 10px 10px 10px 0px;
+	//padding-right: 10px;
+
+	ul {
+		display: table;
+		width: $links-column-size;
+
+		margin: 0 auto;
+
+
+	}
+
+	li {
+		display: table-row;
+		text-align: right;
+
+		a {
+			display: block;
+
+			text-decoration: none;
+
+			color: $color-mid-dark;
+			font-family: $font-text-2;  //not happy with font
+			font-size: 12px;
+			z-index: 1;
+			padding: 0 1em;  // enlarge clicklable area   
+			margin: 0 -1em;  // negates result of padding 
+
+			&:hover {
+			color: $color-light;
+			background-color: $color-highlight;
+			}
+		}
+	}
+}
+
+// this is the class styling for a{}
+
+// .sidebar-link {
+
+// 	
+// 	}
+// }
+
+
 // center and resize images
 img {
 	max-width: 80vw;
 }
 
 
+
+//MEDIA QUERIES LAST, SINCE THEY CAN BE OVERWRITEN BY STYLING
+// BELOW THEM
+
+// what to do when this page is resized
+// for my own (1280x800) screen (LQ)
+@media only screen
+and (min-device-width: 1200px)
+and (max-width: 900px) {
+	html {
+		background-color: $color-alt-bg;
+		// wash gradient left
+		//box-shadow: 1/2*$menu-width -10px $menu-width $color-mid-dark inset;
+	}
+
+	.sidebar-menu {
+		display: block;
+	}
+
+	.markdown-body {
+		background-color: grey;
+		//padding: 0 0 0 $menu-width;
+		//margin: 10px;
+		//padding: 15px;
+	}
+
+	.slide-divider {
+		background-color: darken($color-mid, 1);
+		// apply box shadow to every slide in edit mode
+		box-shadow: $box-shadow;
+	}
+
+	// doesn't work for some damn reason
+	.slides {
+		background: $color-light;
+		height: $slide-y/$slide-x*100vw;
+		//width: 100vw
+	}
+}
+
 // highlighting colour
 ::selection {
 	background-color: $color-highlight;
 	color: $color-light;
 }
-

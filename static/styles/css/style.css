@@ -12,6 +12,21 @@ html {
   background-color: #F9F9F9;
   counter-reset: slide-number; }
 
+.scroll-container {
+  height: 95vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  -webkit-scroll-snap-type: mandatory;
+  scroll-snap-type: y mandatory;
+  -webkit-scroll-snap-destination: 50% 50%;
+  scroll-snap-destination: 50% 50%; }
+
+.scroll-area {
+  -webkit-scroll-snap-coordinate: 50% 50%;
+  scroll-snap-coordinate: 50% 50%;
+  scroll-snap-align: center; }
+
 .markdown-body {
   transition: all 500ms;
   transition-timing-function: ease-in-out;
@@ -19,30 +34,15 @@ html {
   box-sizing: border-box;
   min-width: 200px;
   margin: 0 auto;
-  padding: 0px; }
+  padding: 0px;
+  position: relative; }
 
 .slide-divider {
+  position: relative;
   height: 100%;
   height: 100vh;
-  position: relative;
-  margin: 15px;
   background-color: #F9F9F9; }
-  .slide-divider:nth-child(odd) {
-    box-shadow: 0px 0px 5px #D7DAE5; }
 
-@media only screen and (min-device-width: 1200px) and (max-width: 900px) {
-  html {
-    background-color: #EDEDED; }
-
-  .markdown-body {
-    padding: 0 0 0 100px; }
-
-  .slide-divider {
-    background-color: #eaeaea;
-    box-shadow: 0px 0px 5px #D7DAE5; }
-
-  .slides {
-    background-color: white; } }
 .slides {
   position: absolute;
   top: 0;
@@ -56,8 +56,8 @@ html {
   overflow: hidden;
   box-sizing: border-box;
   padding: 5px;
-  background-color: #F9F9F9; }
-  @media (max-aspect-ratio: 4 / 3) {
+  background: #F9F9F9; }
+  @media (max-aspect-ratio: 16 / 12) {
     .slides {
       top: calc(50vh - 0.375 * (100vw-(100vw-100%)));
       left: 0;
@@ -76,12 +76,12 @@ html {
 h1, h2, h3 {
   font-family: "Raleway", sans-serif; }
 
-ul, ol, a, p, pre {
+li, p, pre {
   transition: font-size 0ms;
   font-size: 1.5vw;
   border-radius: 3px;
   padding: 5px; }
-  ul:hover, ol:hover, a:hover, p:hover, pre:hover {
+  li:hover, p:hover, pre:hover {
     transition: font-size 500ms;
     transition-timing-function: ease-in-out;
     transition-delay: 2s;
@@ -90,9 +90,53 @@ ul, ol, a, p, pre {
     background-color: #B8336A;
     color: #F9F9F9; }
 
+.sidebar-menu {
+  float: left;
+  display: none;
+  height: 80vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: 10px 10px 10px 0px; }
+  .sidebar-menu ul {
+    display: table;
+    width: 20px;
+    margin: 0 auto; }
+  .sidebar-menu li {
+    display: table-row;
+    text-align: right; }
+    .sidebar-menu li a {
+      display: block;
+      text-decoration: none;
+      color: #D7DAE5;
+      font-family: "Montserrat", sans-serif;
+      font-size: 12px;
+      z-index: 1;
+      padding: 0 1em;
+      margin: 0 -1em; }
+      .sidebar-menu li a:hover {
+        color: #F9F9F9;
+        background-color: #B8336A; }
+
 img {
   max-width: 80vw; }
 
+@media only screen and (min-device-width: 1200px) and (max-width: 900px) {
+  html {
+    background-color: #EDEDED; }
+
+  .sidebar-menu {
+    display: block; }
+
+  .markdown-body {
+    background-color: grey; }
+
+  .slide-divider {
+    background-color: #eaeaea;
+    box-shadow: 0px 0px 5px #D7DAE5; }
+
+  .slides {
+    background: #F9F9F9;
+    height: 75vw; } }
 ::selection {
   background-color: #B8336A;
   color: #F9F9F9; }

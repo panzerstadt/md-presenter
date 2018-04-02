@@ -2,8 +2,14 @@
 
 {% block body %}
 
+<nav class="sidebar-menu">
+	<ul>
+		{{ sidebar_content }}
+	</ul>
+</nav>
+
 <!-- stuff here -->
-<div class="markdown-body">
+<div class="markdown-body scroll-container">
 	{{ content }}
 </div>
 

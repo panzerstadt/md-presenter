@@ -110,7 +110,7 @@ def convert_slides(html_string):
     # turns words from these tags into slides (usually titles)
     html_tags_to_convert = ['h1', 'h2']
     # add these classes into the div container
-    classes_slides = "slide-divider"
+    classes_slides = "slide-divider scroll-area"
     classes_css = "slides"
     html_divider = "<!--next slide-->"
 
@@ -132,21 +132,31 @@ def convert_slides(html_string):
             #print('appending ', stuff, '\n----------')
             converted.append(
                 """
-                <div class='{0}'>
-                <div id='slide{3}' class='{1}'>
-                {2}
-                </div>
+                <div class="{0}">
+                    <div class="slide-frame">
+                        <div class="{1}" id="slide{3}">
+                            {2}
+                        </div>
+                    </div>
                 </div>
                 """.format(classes_slides, classes_css, stuff, i)
             )
     # print(converted[0])
-    return ''.join(converted)
+    return ''.join(converted), len(temp)
 
 
-def make_content(filepath_in, urlify=True, fix_images=True):
+def make_sidebar(num_slides):
+    links = ['<li><a class="sidebar-link" href="#slide{0}">{0}</a></li>'.format(i) for i in range(num_slides)]
+    sidebar_links = '\n'.join(links)
+    #print(sidebar_links)
+    return sidebar_links
+
+
+def make_page(filepath_in, urlify=True, fix_images=True):
     image_dir = os.path.dirname(filepath_in) + '/'
     copy_images_to_static(image_dir)  # makes a copy of the images found in the content's local /images folder
 
+    # open and preprocess file
     with open(filepath_in, encoding='utf-8', errors='ignore') as md_content:
         md_content = md_content.readlines()
         # DO MARKDOWN INJECTION HERE
@@ -158,27 +168,34 @@ def make_content(filepath_in, urlify=True, fix_images=True):
             md_content[j] = line
         result = ''.join(md_content)
 
+    # create html content
     html_content = markdown_to_html_unescaped(result)
-    html_content = convert_slides(html_content)
+    html_content, num_slides = convert_slides(html_content)
     html_content = Markup(html_content)
+
+    # create sidebar
+    sidebar_content = Markup(make_sidebar(num_slides))
+
     #print(type(html_content))
     # DO HTML INJECTION HERE
 
-    output = html_content
-    return output
+    return html_content, sidebar_content
+
 
 
 
 app = Flask(__name__)
 
 test_file = './static/content/google earth engine/gee-readme.md'
-content = make_content(test_file)
+content, sidebar_content = make_page(test_file)
+
 
 @app.route('/')
 def main_page():
-    global content
+    global content, sidebar_content
     return render_template('presentation.html',
-                           content=content)
+                           content=content,
+                           sidebar_content=sidebar_content)
 
 
 
