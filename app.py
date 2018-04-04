@@ -51,6 +51,7 @@ def markdown_to_html(md_content):
 def markdown_to_html_unescaped(md_content):
     return markdown.markdown(md_content)
 
+
 def copy_images_to_static(src_dir, dst_dir='./static/images'):
     temp = list(os.walk(src_dir))
     destination_folder = dst_dir
@@ -187,6 +188,7 @@ def make_page(filepath_in, urlify=True, fix_images=True):
 app = Flask(__name__)
 
 test_file = './static/content/google earth engine/gee-readme.md'
+#test_file = './static/content/javascript/javascript-readme.md'
 content, sidebar_content = make_page(test_file)
 
 
